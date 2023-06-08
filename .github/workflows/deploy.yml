@@ -1,0 +1,9 @@
+name: Check Current Working Directory
+on: [push]
+jobs:
+   checkdir:
+      runs-on:
+         labels: runner1
+      steps:
+       - name: print cwd
+         run: pwd
