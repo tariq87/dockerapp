@@ -25,3 +25,15 @@ jobs:
           context: .
           push: true
           tags: tariq87/webapp:${{ github.sha }}
+          
+      - name: Deploy to EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            docker stop webapp || true
+            docker rm webapp || true
+            docker pull ${{ secrets.DOCKER_USERNAME }}/webapp:latest
+            docker run -d --name webapp -p 80:80 ${{ secrets.DOCKER_USERNAME }}/webapp:latest
