@@ -1,9 +1,24 @@
-name: Check Current Working Directory
-on: [push]
+name: Docker CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-   checkdir:
-      runs-on:
-         labels: runner1
-      steps:
-       - name: print cwd
-         run: pwd
+  build-test-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-docker@v1
+
+      - name: Build Docker image
+        run: |
+          docker build -t webapp:latest .
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker tag webapp:latest ${{ secrets.DOCKER_USERNAME }}/webapp:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/webapp:latest
